@@ -1,0 +1,14 @@
+server:
+  port: 8084
+
+spring:
+  data:
+    redis:
+      host: redis-order
+      port: 6378
+  application:
+    name: order-service
+
+grpc:
+  server:
+    port: 6567

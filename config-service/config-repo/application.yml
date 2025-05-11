@@ -1,0 +1,32 @@
+spring:
+  http:
+    converters:
+      prefer-json: true
+  fail-fast: true
+  retry:
+    max-attempts: 12
+    initial-interval: 2000
+
+logging:
+  level:
+    root: INFO
+    com.mycompany: DEBUG
+
+grpc:
+  client:
+    supplier-service:
+      address: "static://supplier-service:6564"
+    user-service:
+      address: "static://user-service:6565"
+    cart-service:
+      address: "static://cart-service:6566"
+    order-service:
+      address: "static://order-service:6567"
+    product-service:
+      address: "static://product-service:6568"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

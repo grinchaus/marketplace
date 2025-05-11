@@ -1,0 +1,18 @@
+server:
+  port: 8082
+
+spring:
+  datasource:
+    url: jdbc:postgresql://supplier-db:5432/supplierdb
+    username: supplier_user
+    password: supplier_secret
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  application:
+    name: supplier-service
+
+grpc:
+  server:
+    port: 6564

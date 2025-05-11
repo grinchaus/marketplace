@@ -1,0 +1,21 @@
+server:
+  port: 8086
+
+spring:
+  datasource:
+    url: jdbc:postgresql://auth-db:5432/authdb
+    username: auth_user
+    password: auth_secret
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  application:
+    name: auth-service
+
+auth:
+  jwt:
+    private-key-location: classpath:private.pem
+    public-key-location: classpath:public.pem
+    access-token-validity-seconds: 900
+    refresh-token-validity-seconds: 604800
