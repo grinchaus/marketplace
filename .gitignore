@@ -1,0 +1,62 @@
+########################
+#  Universal / General #
+########################
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+*~
+.nb-gradle/
+
+.DS_Store
+Thumbs.db
+
+####################
+#  Java / Maven    #
+####################
+# Build output
+target/
+build/
+
+*.log
+hs_err_pid*
+jacoco.exec
+reports/
+
+.env
+
+####################
+#  Docker          #
+####################
+**/*-data/
+*.tar
+*.testcontainers.properties
+
+####################
+#  IntelliJ / STS  #
+####################
+.apt_generated/
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans/
+.sts4-cache/
+
+####################
+#  Binaries / blobs #
+####################
+*.zip
+*.jar
+*.deb
+*.exe
+
+####################
+#  Project-specific #
+####################
+!.mvn/wrapper/maven-wrapper.jar
+redis-*.conf
+docker.sh
+start.txt
+try.sh
