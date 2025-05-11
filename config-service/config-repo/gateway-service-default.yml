@@ -1,0 +1,44 @@
+server:
+  port: 8080
+
+spring:
+  main:
+    web-application-type: reactive
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      routes:
+        - id: supplier-service
+          uri: http://supplier-service:8082
+          predicates:
+            - 'Path=/suppliers/**'
+        - id: user-service
+          uri: http://user-service:8081
+          predicates:
+            - 'Path=/users/**'
+        - id: auth-service
+          uri: http://auth-service:8086
+          predicates:
+            - 'Path=/auth/**'
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+
+security:
+  jwt:
+    public-key: |
+      MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtHDje9aE15vgD2A/NKCL
+      7hVacuaMwZE+xy2i2CgFswrjavlCy9ZaS0z2Mklbw7Vg6z15suRYSe3CHoQJyV00
+      hW3RsLFBRaAP2kYCfFJcp9h4gynWaK9Xw3R1KyiYNSguZgX1X4qFkA6ZhJKg7ZEp
+      Wc1v94O6rXJItbaMn54TnUxfJQcBE6HNqb9AztUBKM9VHKr0yMOlhqB6jfeKbP2F
+      ZJ2M0z/XdzoXTbnVv3zdj26LV/yp0kfWkzRb5RuLeot/xqhsioze0kklVv8fTvhM
+      aOegjWJiT5c9QC6KPWDjU4ckpYxfmMwxYVNysSl5c8e40PQWe5SDcV/BziXQaOX8
+      lQIDAQAB

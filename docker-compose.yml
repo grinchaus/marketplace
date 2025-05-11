@@ -1,0 +1,216 @@
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  auth-db-data:
+  product-db-data:
+  supplier-db-data:
+  user-db-data:
+
+x-config-ready:
+  depends_on:
+    config-service:
+      condition: service_healthy
+
+services:
+  redis-cart:
+    image: redis:7
+    container_name: redis-cart
+    networks: [ internal ]
+    ports: [ "16379:6379" ]
+
+  redis-order:
+    image: redis:7
+    container_name: redis-order
+    command: [ "redis-server", "--port", "6378" ]
+    networks: [ internal ]
+    ports: [ "6378:6378" ]
+
+  auth-db:
+    image: postgres:15
+    container_name: auth-db
+    environment:
+      POSTGRES_DB: authdb
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: auth_secret
+    volumes: [ auth-db-data:/var/lib/postgresql/data ]
+    networks: [ internal ]
+
+  product-db:
+    image: postgres:15
+    container_name: product-db
+    environment:
+      POSTGRES_DB: productdb
+      POSTGRES_USER: product_user
+      POSTGRES_PASSWORD: product_secret
+    volumes: [ product-db-data:/var/lib/postgresql/data ]
+    networks: [ internal ]
+
+  supplier-db:
+    image: postgres:15
+    container_name: supplier-db
+    environment:
+      POSTGRES_DB: supplierdb
+      POSTGRES_USER: supplier_user
+      POSTGRES_PASSWORD: supplier_secret
+    volumes: [ supplier-db-data:/var/lib/postgresql/data ]
+    networks: [ internal ]
+
+  user-db:
+    image: postgres:15
+    container_name: user-db
+    environment:
+      POSTGRES_DB: userdb
+      POSTGRES_USER: user_user
+      POSTGRES_PASSWORD: user_secret
+    volumes: [ user-db-data:/var/lib/postgresql/data ]
+    networks: [ internal ]
+
+  config-service:
+    build: ./config-service
+    volumes:
+      - ./config-service/config-repo:/config-repo:ro
+    container_name: config-service
+    networks: [ internal ]
+    ports: [ "8888:8888" ]
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8888/actuator/health" ]
+      start_period: 30s
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    networks: [ internal ]
+    ports: [ "8086:8086" ]
+    depends_on:
+      config-service:
+        condition: service_healthy
+      auth-db:
+        condition: service_started
+    environment:
+      SPRING_CONFIG_IMPORT: "optional:configserver:http://config-service:8888"
+      SPRING_CLOUD_CONFIG_URI: "http://config-service:8888"
+      SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS: "20"
+      SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL: "2000"
+      SPRING_CLOUD_CONFIG_FAIL_FAST: "false"
+      SPRING_DATASOURCE_URL: jdbc:postgresql://auth-db:5432/authdb
+      SPRING_DATASOURCE_USERNAME: auth_user
+      SPRING_DATASOURCE_PASSWORD: auth_secret
+
+  cart-service:
+    build: ./cart-service
+    container_name: cart-service
+    networks: [ internal ]
+    ports: [ "8085:8085" ]
+    depends_on:
+      config-service:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: "optional:configserver:http://config-service:8888"
+      SPRING_CLOUD_CONFIG_URI: "http://config-service:8888"
+      SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS: "20"
+      SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL: "2000"
+      SPRING_CLOUD_CONFIG_FAIL_FAST: "false"
+      SPRING_DATA_REDIS_HOST: redis-cart
+      SPRING_DATA_REDIS_PORT: 6379
+      GRPC_SERVER_PORT: 6566
+
+  order-service:
+    build: ./order-service
+    container_name: order-service
+    networks: [ internal ]
+    ports: [ "8084:8084" ]
+    depends_on:
+      config-service:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: "optional:configserver:http://config-service:8888"
+      SPRING_CLOUD_CONFIG_URI: "http://config-service:8888"
+      SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS: "20"
+      SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL: "2000"
+      SPRING_CLOUD_CONFIG_FAIL_FAST: "false"
+      SPRING_DATA_REDIS_HOST: redis-order
+      SPRING_DATA_REDIS_PORT: 6378
+      GRPC_SERVER_PORT: 6567
+
+  product-service:
+    build: ./product-service
+    container_name: product-service
+    networks: [ internal ]
+    ports: [ "8083:8083" ]
+    depends_on:
+      config-service:
+        condition: service_healthy
+      product-db:
+        condition: service_started
+    environment:
+      SPRING_CONFIG_IMPORT: "optional:configserver:http://config-service:8888"
+      SPRING_CLOUD_CONFIG_URI: "http://config-service:8888"
+      SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS: "20"
+      SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL: "2000"
+      SPRING_CLOUD_CONFIG_FAIL_FAST: "false"
+      SPRING_DATASOURCE_URL: jdbc:postgresql://product-db:5432/productdb
+      SPRING_DATASOURCE_USERNAME: product_user
+      SPRING_DATASOURCE_PASSWORD: product_secret
+      GRPC_SERVER_PORT: 6568
+
+  supplier-service:
+    build: ./supplier-service
+    container_name: supplier-service
+    networks: [ internal ]
+    ports: [ "8082:8082" ]
+    depends_on:
+      config-service:
+        condition: service_healthy
+      supplier-db:
+        condition: service_started
+    environment:
+      SPRING_CONFIG_IMPORT: "optional:configserver:http://config-service:8888"
+      SPRING_CLOUD_CONFIG_URI: "http://config-service:8888"
+      SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS: "20"
+      SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL: "2000"
+      SPRING_CLOUD_CONFIG_FAIL_FAST: "false"
+      SPRING_DATASOURCE_URL: jdbc:postgresql://supplier-db:5432/supplierdb
+      SPRING_DATASOURCE_USERNAME: supplier_user
+      SPRING_DATASOURCE_PASSWORD: supplier_secret
+      GRPC_SERVER_PORT: 6564
+
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    networks: [ internal ]
+    ports: [ "8081:8081" ]
+    depends_on:
+      config-service:
+        condition: service_healthy
+      user-db:
+        condition: service_started
+    environment:
+      SPRING_CONFIG_IMPORT: "optional:configserver:http://config-service:8888"
+      SPRING_CLOUD_CONFIG_URI: "http://config-service:8888"
+      SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS: "20"
+      SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL: "2000"
+      SPRING_CLOUD_CONFIG_FAIL_FAST: "false"
+      SPRING_DATASOURCE_URL: jdbc:postgresql://user-db:5432/userdb
+      SPRING_DATASOURCE_USERNAME: user_user
+      SPRING_DATASOURCE_PASSWORD: user_secret
+      GRPC_SERVER_PORT: 6565
+
+  gateway-service:
+    build: ./gateway-service
+    container_name: gateway-service
+    networks: [ internal ]
+    ports: [ "8080:8080" ]
+    depends_on:
+      config-service:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: "optional:configserver:http://config-service:8888"
+      SPRING_CLOUD_CONFIG_URI: "http://config-service:8888"
+      SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS: "20"
+      SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL: "2000"
+      SPRING_CLOUD_CONFIG_FAIL_FAST: "false"

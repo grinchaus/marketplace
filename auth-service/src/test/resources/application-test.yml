@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:authdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  cloud.config.enabled: false
+  config.import: ""
+
+auth:
+  jwt:
+    private-key-location: classpath:private.pem
+    public-key-location: classpath:public.pem
+    access-token-validity-seconds: 60
+    refresh-token-validity-seconds: 120
+
+logging:
+  level:
+    org.springframework.security: DEBUG

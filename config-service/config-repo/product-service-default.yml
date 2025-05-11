@@ -1,0 +1,18 @@
+server:
+  port: 8083
+
+spring:
+  datasource:
+    url: jdbc:postgresql://product-db:5432/productdb
+    username: product_user
+    password: product_secret
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  application:
+    name: product-service
+
+grpc:
+  server:
+    port: 6568

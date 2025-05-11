@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package product;
+
+option java_multiple_files = true;
+option java_package = "com.mycompany.productUser";
+option java_outer_classname = "ProductServiceProto";
+
+message Product {
+  string idSupplier = 1;
+  string idProduct = 2;
+  string name = 3;
+  string description = 4;
+  double price = 5;
+  string category = 6;
+}
+
+message GetAllProductsRequest {}
+
+message GetAllProductsResponse {
+  repeated Product products = 1;
+}
+
+message GetProductsByCriteriaRequest {
+  string category = 1;
+  string name = 2;
+}
+
+message GetProductsByCriteriaResponse {
+  repeated Product products = 1;
+}
+
+service ProductService {
+  rpc GetAllProducts(GetAllProductsRequest) returns (GetAllProductsResponse);
+  rpc GetProductsByCriteria(GetProductsByCriteriaRequest) returns (GetProductsByCriteriaResponse);
+}

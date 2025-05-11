@@ -1,0 +1,14 @@
+server:
+  port: 8085
+
+spring:
+  data:
+    redis:
+      host: redis-cart
+      port: 6379
+  application:
+    name: cart-service
+
+grpc:
+  server:
+    port: 6566

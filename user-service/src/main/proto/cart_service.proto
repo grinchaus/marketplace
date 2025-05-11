@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package cart;
+
+option java_multiple_files = true;
+option java_package = "com.mycompany.cartUser";
+option java_outer_classname = "CartServiceProto";
+
+message AddItemRequest {
+  string userId = 1;
+  string productId = 2;
+  int32 quantity = 3;
+}
+
+message AddItemResponse {
+  string status = 1;
+}
+
+message CartItem {
+  string productId = 1;
+  int32 quantity = 2;
+}
+
+message GetCartItemsRequest {
+  string userId = 1;
+}
+
+message GetCartItemsResponse {
+  repeated CartItem items = 1;
+}
+
+message RemoveItemRequest {
+  string userId = 1;
+  string productId = 2;
+  int32 quantity = 3;
+}
+
+message RemoveItemResponse {
+  string status = 1;
+}
+
+service CartService {
+  rpc AddItemToCart(AddItemRequest) returns (AddItemResponse);
+  rpc GetCartItems(GetCartItemsRequest) returns (GetCartItemsResponse);
+  rpc RemoveItemFromCart(RemoveItemRequest) returns (RemoveItemResponse);
+}
