@@ -12,7 +12,7 @@
 | Сервис           | Назначение                                   | Путь в репозитории  |
 |------------------|----------------------------------------------|---------------------|
 | gateway-service  | Edge-шлюз, маршрутизация, валидация JWT      | `/gateway-service`  |
-| auth-service     | Выдача JWT-токенов, OAuth2, RSA-ключи        | `/auth-service`     |
+| auth-service     | Выдача JWT-токенов, RSA-ключи                | `/auth-service`     |
 | user-service     | CRUD пользователей (gRPC + PostgreSQL)       | `/user-service`     |
 | product-service  | Каталог товаров (gRPC + PostgreSQL)          | `/product-service`  |
 | cart-service     | Корзина (gRPC + Redis)                       | `/cart-service`     |
