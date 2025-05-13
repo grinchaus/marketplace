@@ -59,7 +59,7 @@ public class JwtTokenProvider {
   }
 
   public String getUserNameFromJwtToken(String token) {
-    return Jwts.parserBuilder()
+    return Jwts.parser()
         .setSigningKey(rsaPublicKey)
         .build()
         .parseClaimsJws(token)
@@ -69,7 +69,7 @@ public class JwtTokenProvider {
 
   public boolean validateToken(String token) {
     try {
-      Jwts.parserBuilder().setSigningKey(rsaPublicKey).build().parseClaimsJws(token);
+      Jwts.parser().setSigningKey(rsaPublicKey).build().parseClaimsJws(token);
       return true;
     } catch (MalformedJwtException | IllegalArgumentException ex) {
       log.debug("Invalid JWT token", ex);
