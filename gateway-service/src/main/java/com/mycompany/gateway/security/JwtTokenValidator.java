@@ -36,12 +36,7 @@ public class JwtTokenValidator implements InitializingBean {
 
   public Mono<Claims> validate(String token) {
     return Mono.fromCallable(
-            () ->
-                Jwts.parserBuilder()
-                    .setSigningKey(publicKey)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody())
+            () -> Jwts.parser().setSigningKey(publicKey).build().parseClaimsJws(token).getBody())
         .doOnError(e -> log.debug("JWT validation failed: {}", e.getMessage()))
         .subscribeOn(Schedulers.boundedElastic());
   }
